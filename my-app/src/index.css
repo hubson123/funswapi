@@ -1,13 +1,52 @@
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
+  font-family: "Starjout";
+  color: yellow;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
+}
+.cont {
+  position: absolute;
+  height: 100%;
+  width: 100%;
+  background: -webkit-linear-gradient(90deg, #142d4c 10%, #000000 90%);
+  background: -moz-linear-gradient(90deg, #142d4c 10%, #000000 90%);
+  background: -ms-linear-gradient(90deg, #142d4c 10%, #000000 90%);
+  background: -o-linear-gradient(90deg, #142d4c 10%, #000000 90%);
+  background: linear-gradient(90deg, #142d4c 10%, #000000 90%);
+}
+
+.stars {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  background: url(http://www.script-tutorials.com/demos/360/images/stars.png)
+    repeat top center;
+  z-index: 0;
+}
+
+.interface {
+  overflow: hidden;
+  height: 80%;
+  width: 80%;
+  position: absolute;
+  top: 10%;
+  left: 10%;
+  opacity: 0.9;
+}
+@font-face {
+  font-family: "Starjout";
+  src: local("Starjout"),
+    url("./fonts/StarYedi/Starjout.ttf") format("truetype");
+  font-weight: bold;
 }
