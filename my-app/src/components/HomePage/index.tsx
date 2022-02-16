@@ -8,7 +8,8 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { useMemo } from "react";
 import { useEffect } from "react";
 import styled from "styled-components";
 import { API_URL } from "../../globals";
@@ -16,11 +17,12 @@ import { Character, Starship } from "../../types/types";
 
 const HomePage = () => {
   const [starships, setStarships] = useState<Starship[]>();
-  const [people, setPeople] = useState<Character[]>();
   const [randomStar, setRandomStar] = useState(0);
   const [randomStar2, setRandomStar2] = useState(1);
   const [game, setGame] = useState(false);
   const [multiplayer, setMultiplayer] = useState(false);
+  const [oneWin, setOneWin] = useState(false);
+  const [twoWin, setTwoWin] = useState(false);
   const [playerScore, setPlayerScore] = useState(0);
   const [playerTwoScore, setPlayerTwoScore] = useState(0);
 
@@ -32,15 +34,32 @@ const HomePage = () => {
 
   const handleOnePlayerClick = () => {
     setGame(true);
+    setMultiplayer(false);
     setRandomStar(getRandomInt(0, 6));
     setRandomStar2(getRandomInt(1, 9));
   };
 
   const handleTwoPlayersClick = () => {
-    setGame(true);
     setMultiplayer(true);
     setRandomStar(getRandomInt(0, 6));
     setRandomStar2(getRandomInt(1, 9));
+    if (
+      starships !== undefined &&
+      parseInt(starships[randomStar].crew) >
+        parseInt(starships[randomStar2].crew)
+    ) {
+      setPlayerScore(playerScore + 1);
+      setOneWin(true);
+      setTwoWin(false);
+    } else if (
+      starships !== undefined &&
+      parseInt(starships[randomStar].crew) <
+        parseInt(starships[randomStar2].crew)
+    ) {
+      setPlayerTwoScore(playerTwoScore + 1);
+      setTwoWin(true);
+      setOneWin(false);
+    }
   };
 
   const fetchData = () => {
@@ -56,19 +75,11 @@ const HomePage = () => {
   }, []);
 
   const whoWins = () => {
-    if (starships !== undefined && game) {
+    if (starships !== undefined) {
       if (multiplayer) {
-        if (
-          parseInt(starships[randomStar].crew) >
-          parseInt(starships[randomStar2].crew)
-        ) {
-          setPlayerScore(playerScore + 1);
+        if (oneWin) {
           return `Player 1 wins!`;
-        } else if (
-          parseInt(starships[randomStar].crew) <
-          parseInt(starships[randomStar2].crew)
-        ) {
-          setPlayerTwoScore(playerTwoScore + 1);
+        } else if (twoWin) {
           return `Player 2 wins!`;
         } else {
           return `Draw`;
@@ -88,6 +99,8 @@ const HomePage = () => {
           return `Draw`;
         }
       }
+    } else {
+      return "Play!";
     }
   };
   return (
@@ -101,16 +114,19 @@ const HomePage = () => {
         2 players
       </Button>
       <GameWrapper>
-        {game && (
+        {(game || multiplayer) && (
           <>
             {starships !== undefined && (
               <StarshipCard>
-                <h2>{starships[randomStar].name}</h2>
-                <p>{starships[randomStar].cargo_capacity}</p>
-                <p>{starships[randomStar].passengers}</p>
-                <p>{starships[randomStar].starship_class}</p>
-                <p>{starships[randomStar].max_atmosphering_speed}</p>
-                <p>{starships[randomStar].crew}</p>
+                <h2> Name: {starships[randomStar].name}</h2>
+                <p>Cargo Capacity: {starships[randomStar].cargo_capacity}</p>
+                <p>Passengers: {starships[randomStar].passengers}</p>
+                <p>Starship Class: {starships[randomStar].starship_class}</p>
+                <p>
+                  Max Atmosphering Speed:{" "}
+                  {starships[randomStar].max_atmosphering_speed}
+                </p>
+                <p>Crew: {starships[randomStar].crew}</p>
               </StarshipCard>
             )}
 
@@ -129,42 +145,42 @@ const HomePage = () => {
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].name}
+                    {`Name: ${starships[randomStar2].name}`}
                   </Typography>
                   <Typography
                     sx={{ mb: 1.5 }}
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].cargo_capacity}
+                    {`Cargo capacity: ${starships[randomStar2].cargo_capacity}`}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].passengers}
+                    {`Passengers: ${starships[randomStar2].passengers}`}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].starship_class}
+                    {`Starship class: ${starships[randomStar2].starship_class}`}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].max_atmosphering_speed}
+                    {`Max Atmosphering Speed ${starships[randomStar2].max_atmosphering_speed}`}
                   </Typography>
                   <Typography
                     variant="body2"
                     color="yellow"
                     fontFamily={"Starjout"}
                   >
-                    {starships[randomStar2].crew}
+                    {`Crew: ${starships[randomStar2].crew}`}
                   </Typography>
                 </CardContent>
               </Card>
@@ -172,7 +188,8 @@ const HomePage = () => {
           </>
         )}
       </GameWrapper>
-      {game && whoWins()}
+
+      {(game || multiplayer) && whoWins()}
       {multiplayer && (
         <>
           <Typography
@@ -202,14 +219,17 @@ const HomePage = () => {
         </>
       )}
       {game && (
-        <Button
-          size="medium"
-          onClick={() =>
-            multiplayer ? handleTwoPlayersClick() : handleOnePlayerClick()
-          }
-        >
-          Play again
-        </Button>
+        <>
+          <br />
+          <Button
+            size="medium"
+            onClick={() =>
+              multiplayer ? handleTwoPlayersClick() : handleOnePlayerClick()
+            }
+          >
+            Play again
+          </Button>
+        </>
       )}
     </>
   );
