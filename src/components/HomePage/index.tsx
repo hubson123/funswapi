@@ -1,19 +1,9 @@
-import {
-  Button,
-  Card,
-  CardActions,
-  CardContent,
-  CardMedia,
-  List,
-  Typography,
-  useTheme,
-} from "@mui/material";
-import { useCallback, useState } from "react";
-import { useMemo } from "react";
-import { useEffect } from "react";
+import { Button, Card, CardContent, Typography } from "@mui/material";
+import { useEffect, useState } from "react";
+
 import styled from "styled-components";
 import { API_URL } from "../../globals";
-import { Character, Starship } from "../../types/types";
+import { Starship } from "../../types/types";
 
 const HomePage = () => {
   const [starships, setStarships] = useState<Starship[]>();
